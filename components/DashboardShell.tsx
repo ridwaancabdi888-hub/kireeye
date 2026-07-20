@@ -1,2 +1,61 @@
+"use client";
+
 import Link from "next/link";
-export function DashboardShell({title,children}:{title:string;children:React.ReactNode}){return <div className="dashboard"><aside className="sidebar"><div className="logo"><span className="logo-mark">K</span>Kireeye</div><p style={{color:"#91a3b5"}}>Management Portal</p>{["Overview","Bookings","Vehicles","Customers","Employees","Payments","Reports","Settings"].map((x,i)=><a key={x} className={`side-link ${i===0?"active":""}`}>{x}</a>)}<Link className="side-link" href="/">← Website</Link></aside><main className="main"><div className="row"><div><p className="muted">Kireeye Dashboard</p><h1 style={{fontSize:38,letterSpacing:-1,marginTop:0}}>{title}</h1></div><button className="btn btn-primary">+ Ku dar gaadhi</button></div>{children}</main></div>}
+import { usePathname } from "next/navigation";
+import { createSupabaseBrowserClient } from "@/lib/auth";
+
+const customerNav = [
+  ["Overview", "/customer"],
+  ["Bookings", "/customer/bookings"],
+  ["Notifications", "/customer/notifications"],
+  ["Profile & Documents", "/customer/profile"],
+];
+
+const companyNav = [
+  ["Overview", "/company"],
+  ["Bookings", "/company/bookings"],
+  ["Vehicles", "/company/vehicles"],
+  ["Add Vehicle", "/company/vehicles/new"],
+  ["Employees", "/company/employees"],
+  ["Payments", "/company/payments"],
+];
+
+const adminNav = [
+  ["Overview", "/admin"],
+  ["Approvals", "/admin/approvals"],
+  ["Users", "/admin/users"],
+  ["Companies", "/admin/companies"],
+  ["Vehicles", "/admin/vehicles"],
+  ["Bookings", "/admin/bookings"],
+  ["Payments", "/admin/payments"],
+  ["Settings", "/admin/settings"],
+  ["Audit Logs", "/admin/audit-logs"],
+];
+
+export function DashboardShell({ title, children }: { title: string; children: React.ReactNode }) {
+  const pathname = usePathname();
+  const portal = pathname.startsWith("/admin") ? "admin" : pathname.startsWith("/company") ? "company" : "customer";
+  const navigation = portal === "admin" ? adminNav : portal === "company" ? companyNav : customerNav;
+
+  async function signOut() {
+    try {
+      const supabase = createSupabaseBrowserClient();
+      await supabase.auth.signOut();
+    } finally {
+      window.location.href = "/";
+    }
+  }
+
+  return <div className="dashboard">
+    <aside className="sidebar">
+      <Link className="logo" href="/"><span className="logo-mark">K</span>Kireeye</Link>
+      <p className="sidebar-label">{portal === "admin" ? "Super Admin Portal" : portal === "company" ? "Company Portal" : "Customer Portal"}</p>
+      <nav>{navigation.map(([label, href]) => <Link key={href} href={href} className={`side-link ${pathname === href ? "active" : ""}`}>{label}</Link>)}</nav>
+      <div className="sidebar-bottom"><Link className="side-link" href="/">← Website</Link><button className="side-link signout-button" onClick={signOut}>Sign out</button></div>
+    </aside>
+    <main className="main">
+      <div className="row dashboard-heading"><div><p className="muted">Kireeye Dashboard</p><h1 className="dashboard-title">{title}</h1></div>{portal === "company" && <Link className="btn btn-primary" href="/company/vehicles/new">+ Ku dar gaadhi</Link>}</div>
+      {children}
+    </main>
+  </div>;
+}
