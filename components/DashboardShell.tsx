@@ -9,15 +9,18 @@ const customerNav = [
   ["Bookings", "/customer/bookings"],
   ["Notifications", "/customer/notifications"],
   ["Profile & Documents", "/customer/profile"],
+  ["Support", "/support"],
 ];
 
 const companyNav = [
   ["Overview", "/company"],
+  ["Company Profile", "/company/onboarding"],
   ["Bookings", "/company/bookings"],
   ["Vehicles", "/company/vehicles"],
   ["Add Vehicle", "/company/vehicles/new"],
   ["Employees", "/company/employees"],
   ["Payments", "/company/payments"],
+  ["Support", "/support"],
 ];
 
 const adminNav = [
@@ -50,7 +53,7 @@ export function DashboardShell({ title, children }: { title: string; children: R
     <aside className="sidebar">
       <Link className="logo" href="/"><span className="logo-mark">K</span>Kireeye</Link>
       <p className="sidebar-label">{portal === "admin" ? "Super Admin Portal" : portal === "company" ? "Company Portal" : "Customer Portal"}</p>
-      <nav>{navigation.map(([label, href]) => <Link key={href} href={href} className={`side-link ${pathname === href ? "active" : ""}`}>{label}</Link>)}</nav>
+      <nav>{navigation.map(([label, href]) => <Link key={href} href={href} className={`side-link ${pathname === href || (href !== `/${portal}` && pathname.startsWith(`${href}/`)) ? "active" : ""}`}>{label}</Link>)}</nav>
       <div className="sidebar-bottom"><Link className="side-link" href="/">← Website</Link><button className="side-link signout-button" onClick={signOut}>Sign out</button></div>
     </aside>
     <main className="main">
