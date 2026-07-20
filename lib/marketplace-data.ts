@@ -11,10 +11,54 @@ export type MarketplaceVehicle = {
 };
 
 const fallbackVehicles: MarketplaceVehicle[] = [
-  { id: "toyota-one-ten", name: "Toyota Land Cruiser One Ten", category: "4x4", price_day: 95, rating: 4.9, locations: { name: "Hargeysa", city: "Hargeysa" }, vehicle_images: [] },
-  { id: "toyota-noah", name: "Toyota Noah", category: "Minivan", price_day: 55, rating: 4.8, locations: { name: "Muqdisho", city: "Muqdisho" }, vehicle_images: [] },
-  { id: "toyota-surf-2tr", name: "Toyota Surf 2TR", category: "SUV", price_day: 70, rating: 4.7, locations: { name: "Hargeysa Airport", city: "Hargeysa" }, vehicle_images: [] },
-  { id: "toyota-prado", name: "Toyota Prado", category: "SUV", price_day: 85, rating: 4.8, locations: { name: "Muqdisho Airport", city: "Muqdisho" }, vehicle_images: [] },
+  {
+    id: "toyota-one-ten",
+    name: "Toyota One Ten 2004",
+    category: "Sedan",
+    price_day: 45,
+    rating: 4.9,
+    locations: { name: "Hargeysa", city: "Hargeysa" },
+    vehicle_images: [{
+      public_url: "https://commons.wikimedia.org/wiki/Special:Redirect/file/2002-2004%20Toyota%20Mark%20II.jpg",
+      sort_order: 0,
+    }],
+  },
+  {
+    id: "toyota-noah",
+    name: "Toyota Noah",
+    category: "Minivan",
+    price_day: 55,
+    rating: 4.8,
+    locations: { name: "Muqdisho", city: "Muqdisho" },
+    vehicle_images: [{
+      public_url: "https://commons.wikimedia.org/wiki/Special:Redirect/file/Toyota%20Noah.JPG",
+      sort_order: 0,
+    }],
+  },
+  {
+    id: "toyota-surf-2tr",
+    name: "Toyota Hilux Surf 2TR",
+    category: "SUV",
+    price_day: 70,
+    rating: 4.7,
+    locations: { name: "Hargeysa Airport", city: "Hargeysa" },
+    vehicle_images: [{
+      public_url: "https://commons.wikimedia.org/wiki/Special:Redirect/file/Toyota%20Hilux%20Surf%20%286817472025%29.jpg",
+      sort_order: 0,
+    }],
+  },
+  {
+    id: "toyota-prado",
+    name: "Toyota Land Cruiser Prado",
+    category: "SUV",
+    price_day: 85,
+    rating: 4.8,
+    locations: { name: "Muqdisho Airport", city: "Muqdisho" },
+    vehicle_images: [{
+      public_url: "https://commons.wikimedia.org/wiki/Special:Redirect/file/Toyota%20Land-Cruiser%20Prado.jpg",
+      sort_order: 0,
+    }],
+  },
 ];
 
 export async function getAvailableVehicles(): Promise<MarketplaceVehicle[]> {
