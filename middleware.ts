@@ -20,7 +20,15 @@ function dashboardForRole(role?: string | null) {
 export async function middleware(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) return NextResponse.next();
+  if (!url || !key) {
+    // Fail closed: without Supabase configuration we cannot verify anyone,
+    // so protected areas must not be reachable.
+    const pathname = request.nextUrl.pathname;
+    if (protectedRoutes.some((route) => pathname.startsWith(route))) {
+      return NextResponse.redirect(new URL("/signin", request.url));
+    }
+    return NextResponse.next();
+  }
 
   let response = NextResponse.next({ request });
   const supabase = createServerClient(url, key, {
@@ -59,7 +67,9 @@ export async function middleware(request: NextRequest) {
       .eq("user_id", user.id)
       .limit(1)
       .maybeSingle();
-    role = data?.role || user.user_metadata?.role || "customer";
+    // Roles come ONLY from the user_roles table. user_metadata is writable by
+    // the user themselves and must never grant route access (privilege escalation).
+    role = data?.role || "customer";
   }
 
   if (user && pathname.startsWith("/admin") && !adminRoles.has(role || "")) {
