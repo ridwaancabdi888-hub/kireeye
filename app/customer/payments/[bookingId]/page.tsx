@@ -14,10 +14,18 @@ export default function PaymentProofPage({ params }: { params: Promise<{ booking
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    params.then(({ bookingId: id }) => setBookingId(id));
+    params.then(async ({ bookingId: id }) => {
+      setBookingId(id);
+      try {
+        const supabase = createSupabaseBrowserClient();
+        const { data } = await supabase.from("bookings").select("total,status").eq("id", id).maybeSingle();
+        if (data) setAmount(Number(data.total || 0));
+      } catch {
+        setAmount(Number(new URLSearchParams(window.location.search).get("amount") || 0));
+      }
+    });
     const query = new URLSearchParams(window.location.search);
     setMethod(query.get("method") || "ZAAD");
-    setAmount(Number(query.get("amount") || 0));
   }, [params]);
 
   function chooseFile(event: ChangeEvent<HTMLInputElement>) {
@@ -32,6 +40,7 @@ export default function PaymentProofPage({ params }: { params: Promise<{ booking
     if (!file) return setMessage("Fadlan geli screenshot-ka ama receipt-ka lacag-bixinta.");
     setLoading(true);
     setMessage("");
+    let storagePath = "";
 
     try {
       const supabase = createSupabaseBrowserClient();
@@ -39,32 +48,29 @@ export default function PaymentProofPage({ params }: { params: Promise<{ booking
       if (!user) throw new Error("Fadlan soo gal.");
 
       const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
-      const storagePath = `${user.id}/${bookingId}/${crypto.randomUUID()}.${extension}`;
+      storagePath = `${user.id}/${bookingId}/${crypto.randomUUID()}.${extension}`;
       const { error: uploadError } = await supabase.storage.from("payment-proofs").upload(storagePath, file, { upsert: false });
       if (uploadError) throw uploadError;
 
       const form = new FormData(event.currentTarget);
-      const { error: paymentError } = await supabase.from("payments").insert({
-        booking_id: bookingId,
-        method,
-        amount,
-        reference: String(form.get("reference") || ""),
-        status: "pending",
-        proof_url: storagePath,
+      const response = await fetch("/api/payments/proof", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookingId, method, reference: form.get("reference"), proofPath: storagePath }),
       });
-      if (paymentError) throw paymentError;
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Payment proof-ka lama gudbin.");
 
-      await supabase.from("notifications").insert({
-        user_id: user.id,
-        title: "Payment-ka waa la gudbiyey",
-        body: `Receipt-ka ${method} ee booking-kaaga ayaa sugaya xaqiijinta Admin-ka.`,
-        type: "payment",
-        link: "/customer",
-      });
-
+      setAmount(Number(result.amount));
       setMessage("Payment proof-ka waa la gudbiyey. Admin ayaa xaqiijinaya.");
-      setTimeout(() => { window.location.href = "/customer"; }, 1200);
+      setTimeout(() => { window.location.href = "/customer/bookings"; }, 1200);
     } catch (error) {
+      if (storagePath) {
+        try {
+          const supabase = createSupabaseBrowserClient();
+          await supabase.storage.from("payment-proofs").remove([storagePath]);
+        } catch { /* cleanup is best effort */ }
+      }
       setMessage(error instanceof Error ? error.message : "Payment proof-ka lama gudbin.");
       setLoading(false);
     }
@@ -78,9 +84,9 @@ export default function PaymentProofPage({ params }: { params: Promise<{ booking
       <div className="field"><label>Transaction reference</label><input name="reference" required placeholder="Tusaale: TXN-123456"/></div>
       <div className="field"><label>Screenshot ama receipt</label><input type="file" accept="image/jpeg,image/png,image/webp,application/pdf" required onChange={chooseFile}/></div>
       {preview && <img className="payment-preview" src={preview} alt="Payment proof preview"/>}
-      <button className="btn btn-primary" disabled={loading}>{loading ? "Waa la gudbinayaa..." : "Gudbi payment proof"}</button>
+      <button className="btn btn-primary" disabled={loading || !bookingId}>{loading ? "Waa la gudbinayaa..." : "Gudbi payment proof"}</button>
       {message && <p className="form-message">{message}</p>}
     </form>
-    <aside className="booking-card"><h2>Ka hor intaadan gudbin</h2><p className="muted">Hubi in number-ka, amount-ka iyo transaction reference-ku sax yihiin. Screenshot-ka waa inuu si cad u muujiyo lacag-bixinta.</p><div className="summary-line"><span>Status</span><strong>Pending verification</strong></div><div className="summary-line"><span>Booking</span><strong>{bookingId.slice(0,8) || "Loading"}</strong></div></aside>
+    <aside className="booking-card"><h2>Ka hor intaadan gudbin</h2><p className="muted">Hubi in number-ka, amount-ka iyo transaction reference-ku sax yihiin. Server-ku wuxuu amount-ka ka xaqiijinayaa booking-ka.</p><div className="summary-line"><span>Status</span><strong>Pending verification</strong></div><div className="summary-line"><span>Booking</span><strong>{bookingId.slice(0,8) || "Loading"}</strong></div></aside>
   </div></DashboardShell>;
 }
