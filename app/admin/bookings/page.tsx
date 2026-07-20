@@ -1,0 +1,16 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { DashboardShell } from "@/components/DashboardShell";
+import { createSupabaseBrowserClient } from "@/lib/auth";
+
+type Booking={id:string;status:string;pickup_at:string;return_at:string;total:number;commission_amount:number;vehicles:{name:string}|null;profiles:{full_name:string;phone:string|null}|null};
+
+export default function AdminBookingsPage(){
+  const[items,setItems]=useState<Booking[]>([]);const[message,setMessage]=useState("");
+  async function load(){try{const supabase=createSupabaseBrowserClient();const{data,error}=await supabase.from("bookings").select("id,status,pickup_at,return_at,total,commission_amount,vehicles(name),profiles!bookings_customer_id_fkey(full_name,phone)").order("created_at",{ascending:false}).limit(250);if(error)throw error;setItems((data||[]) as unknown as Booking[])}catch(error){setMessage(error instanceof Error?error.message:"Bookings lama soo qaadi karin.")}}
+  useEffect(()=>{load()},[]);
+  const stats=useMemo(()=>({total:items.length,active:items.filter(x=>["confirmed","in_progress"].includes(x.status)).length,revenue:items.filter(x=>x.status==="completed").reduce((a,b)=>a+Number(b.total||0),0),commission:items.filter(x=>x.status==="completed").reduce((a,b)=>a+Number(b.commission_amount||0),0)}),[items]);
+  async function change(id:string,status:string){const supabase=createSupabaseBrowserClient();const{data:{user}}=await supabase.auth.getUser();if(!user)return;const{error}=await supabase.from("bookings").update({status}).eq("id",id);if(error)return setMessage(error.message);await supabase.from("audit_logs").insert({actor_id:user.id,action:"booking.status_changed",entity_type:"booking",entity_id:id,metadata:{status}});load()}
+  return <DashboardShell title="All Bookings"><section className="kpis"><div className="kpi"><span className="muted">Total</span><strong>{stats.total}</strong></div><div className="kpi"><span className="muted">Active</span><strong>{stats.active}</strong></div><div className="kpi"><span className="muted">Completed revenue</span><strong>${stats.revenue.toFixed(2)}</strong></div><div className="kpi"><span className="muted">Commission</span><strong>${stats.commission.toFixed(2)}</strong></div></section><section className="section"><div className="card">{message&&<p className="form-message">{message}</p>}<div className="table-scroll"><table className="table"><thead><tr><th>Vehicle</th><th>Customer</th><th>Dates</th><th>Total</th><th>Status</th><th>Change</th></tr></thead><tbody>{items.map(item=><tr key={item.id}><td><strong>{item.vehicles?.name||"Vehicle"}</strong></td><td>{item.profiles?.full_name||"Customer"}<br/><span className="muted">{item.profiles?.phone||"—"}</span></td><td>{new Date(item.pickup_at).toLocaleDateString()} → {new Date(item.return_at).toLocaleDateString()}</td><td>${item.total}</td><td><span className={`badge status-${item.status}`}>{item.status.replaceAll("_"," ")}</span></td><td><select value={item.status} onChange={e=>change(item.id,e.target.value)}>{["pending","awaiting_payment","confirmed","in_progress","completed","cancelled","rejected","disputed","refunded"].map(s=><option key={s}>{s}</option>)}</select></td></tr>)}</tbody></table></div></div></section></DashboardShell>
+}
