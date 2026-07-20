@@ -1,14 +1,19 @@
 import Link from "next/link";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { getLocale, publicTranslations } from "@/lib/i18n";
 
-export function Navbar() {
+export async function Navbar() {
+  const locale = await getLocale();
+  const t = publicTranslations[locale];
+
   return (
     <header className="nav">
       <div className="container nav-inner">
         <Link className="logo" href="/"><span className="logo-mark">K</span>Kireeye</Link>
         <nav className="nav-links">
-          <Link href="/vehicles">Gaadiid</Link><a href="#cities">Magaalooyin</a><a href="#partners">Shirkadaha</a><a href="#about">Nagu saabsan</a>
+          <Link href="/vehicles">{t.vehicles}</Link><a href="/#cities">{t.cities}</a><Link href="/partners">{t.partners}</Link><Link href="/about">{t.about}</Link>
         </nav>
-        <div className="actions"><Link className="btn btn-secondary" href="/signin">Soo gal</Link><Link className="btn btn-primary" href="/signup">Isdiiwaangeli</Link></div>
+        <div className="actions"><LanguageSwitcher/><Link className="btn btn-secondary" href="/signin">{t.signin}</Link><Link className="btn btn-primary" href="/signup">{t.signup}</Link></div>
       </div>
     </header>
   );
