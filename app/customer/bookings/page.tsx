@@ -5,15 +5,7 @@ import { useEffect, useState } from "react";
 import { DashboardShell } from "@/components/DashboardShell";
 import { createSupabaseBrowserClient } from "@/lib/auth";
 
-type Booking = {
-  id: string;
-  pickup_at: string;
-  return_at: string;
-  total: number;
-  status: string;
-  vehicle_id: string;
-  vehicles: { name: string } | null;
-};
+type Booking = { id:string; pickup_at:string; return_at:string; total:number; status:string; vehicle_id:string; vehicles:{name:string}|null };
 
 export default function CustomerBookingsPage() {
   const [items, setItems] = useState<Booking[]>([]);
@@ -35,11 +27,16 @@ export default function CustomerBookingsPage() {
   useEffect(() => { load(); }, []);
 
   async function cancel(id: string) {
-    const supabase = createSupabaseBrowserClient();
-    const { error } = await supabase.from("bookings").update({ status: "cancelled" }).eq("id", id).in("status", ["pending","awaiting_payment","confirmed"]);
-    if (error) return setMessage(error.message);
-    setMessage("Booking-ka waa la cancel-gareeyey.");
-    load();
+    setMessage("");
+    try {
+      const response = await fetch(`/api/bookings/${id}/cancel`, { method: "POST" });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Booking-ka lama cancel-gareyn.");
+      setMessage(result.cancellationType === "late" ? "Booking-ka waa la cancel-gareeyey. Late-cancellation policy ayaa khusayn karta." : "Booking-ka waa la cancel-gareeyey lacag la’aan.");
+      load();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Booking-ka lama cancel-gareyn.");
+    }
   }
 
   return <DashboardShell title="Bookings-kayga"><section className="list-stack">
