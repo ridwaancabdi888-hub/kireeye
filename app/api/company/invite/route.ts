@@ -29,6 +29,10 @@ export async function POST(request: Request) {
     if (inviteError) throw inviteError;
     if (!invited.user) throw new Error("Invitation user was not created.");
 
+    await admin.from("user_roles").delete().eq("user_id", invited.user.id);
+    const { error: roleError } = await admin.from("user_roles").insert({ user_id: invited.user.id, role: "company_employee" });
+    if (roleError) throw roleError;
+
     const permissionMap = Object.fromEntries(permissions.map((permission: string) => [permission, true]));
     const { error: employeeError } = await admin.from("company_employees").upsert({
       company_id: companyId,
