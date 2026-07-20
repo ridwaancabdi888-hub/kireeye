@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { PWARegister } from "@/components/PWARegister";
 import "./globals.css";
 import "./phase2.css";
 
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
   description: "Somaliland iyo Soomaaliya ka kireyso gaadhi la hubo, darawal leh ama darawal la'aan.",
   applicationName: "Kireeye",
   manifest: "/manifest.webmanifest",
+  icons: { icon: "/icon.svg", apple: "/icon.svg" },
   appleWebApp: { capable: true, title: "Kireeye", statusBarStyle: "default" },
   formatDetection: { telephone: true },
 };
@@ -23,7 +25,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="so">
-      <body>{children}</body>
+      <body>{children}<PWARegister/></body>
     </html>
   );
 }
