@@ -3,7 +3,6 @@
 import { FormEvent, useState } from "react";
 import { DashboardShell } from "@/components/DashboardShell";
 import { VehicleImageUploader } from "@/components/VehicleImageUploader";
-import { createSupabaseBrowserClient } from "@/lib/auth";
 
 export default function AddVehiclePage() {
   const [message, setMessage] = useState("");
@@ -16,38 +15,35 @@ export default function AddVehiclePage() {
     setMessage("");
 
     try {
-      const supabase = createSupabaseBrowserClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Fadlan soo gal.");
-
       const form = new FormData(event.currentTarget);
-      const payload = {
-        owner_id: user.id,
-        name: String(form.get("name")),
-        make: String(form.get("make")),
-        model: String(form.get("model")),
-        year: Number(form.get("year")),
-        category: String(form.get("category")),
-        transmission: String(form.get("transmission")),
-        seats: Number(form.get("seats")),
-        driver_available: form.get("driver") !== null,
-        self_drive_allowed: form.get("selfDrive") !== null,
-        intercity_allowed: form.get("intercity") !== null,
-        price_hour: Number(form.get("priceHour")),
-        price_day: Number(form.get("priceDay")),
-        price_week: Number(form.get("priceWeek")),
-        price_month: Number(form.get("priceMonth")),
-        description: String(form.get("description") || ""),
-        deposit_amount: Number(form.get("deposit") || 0),
-        fuel_type: String(form.get("fuelType") || "Petrol"),
-        plate_number: String(form.get("plateNumber") || ""),
-        status: "pending_approval",
-      };
+      const response = await fetch("/api/company/vehicles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.get("name"),
+          make: form.get("make"),
+          model: form.get("model"),
+          year: Number(form.get("year")),
+          category: form.get("category"),
+          transmission: form.get("transmission"),
+          seats: Number(form.get("seats")),
+          driverAvailable: form.get("driver") !== null,
+          selfDriveAllowed: form.get("selfDrive") !== null,
+          intercityAllowed: form.get("intercity") !== null,
+          priceHour: Number(form.get("priceHour")),
+          priceDay: Number(form.get("priceDay")),
+          priceWeek: Number(form.get("priceWeek")),
+          priceMonth: Number(form.get("priceMonth")),
+          description: form.get("description"),
+          depositAmount: Number(form.get("deposit") || 0),
+          fuelType: form.get("fuelType"),
+          plateNumber: form.get("plateNumber"),
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Gaadhiga lama kaydin.");
 
-      const { data, error } = await supabase.from("vehicles").insert(payload).select("id").single();
-      if (error) throw error;
-
-      setVehicleId(data.id);
+      setVehicleId(result.vehicleId);
       setMessage("Gaadhiga waa la kaydiyey. Hadda geli sawirrada, kadib Admin ayaa ansixinaya.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Gaadhiga lama kaydin.");
@@ -70,8 +66,8 @@ export default function AddVehiclePage() {
         ["priceDay","Qiimaha maalintii","95"],
         ["priceWeek","Qiimaha toddobaadkii","600"],
         ["priceMonth","Qiimaha bishii","2200"],
-      ].map(([name,label,placeholder]) => <div className="field" key={name}><label>{label}</label><input name={name} placeholder={placeholder} required={!["deposit","plateNumber"].includes(name)}/></div>)}
-      <div className="field"><label>Category</label><select name="category"><option>4x4</option><option>SUV</option><option>Sedan</option><option>Minivan</option><option>Pickup</option><option>Luxury</option></select></div>
+      ].map(([name,label,placeholder]) => <div className="field" key={name}><label>{label}</label><input name={name} placeholder={placeholder} required={!['deposit','plateNumber'].includes(name)}/></div>)}
+      <div className="field"><label>Category</label><select name="category"><option>4x4</option><option>SUV</option><option>Sedan</option><option>Hatchback</option><option>Minivan</option><option>Minibus</option><option>Bus</option><option>Pickup</option><option>Luxury</option><option>Cargo</option><option>Construction</option></select></div>
       <div className="field"><label>Transmission</label><select name="transmission"><option>Automatic</option><option>Manual</option></select></div>
       <div className="field"><label>Fuel</label><select name="fuelType"><option>Petrol</option><option>Diesel</option><option>Hybrid</option><option>Electric</option></select></div>
       <div className="field form-span"><label>Sharaxaad</label><textarea name="description" rows={5} placeholder="Xaaladda gaadhiga, adeegyada, iyo shuruudaha kirada"/></div>
