@@ -4,6 +4,7 @@ import "./globals.css";
 import "./phase2.css";
 import "./phase3.css";
 import "./mobile.css";
+import "./image-tools.css";
 
 export const metadata: Metadata = {
   title: {
