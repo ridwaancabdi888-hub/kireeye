@@ -8,7 +8,7 @@ export function Navbar() {
         <nav className="nav-links">
           <Link href="/vehicles">Gaadiid</Link><a href="#cities">Magaalooyin</a><a href="#partners">Shirkadaha</a><a href="#about">Nagu saabsan</a>
         </nav>
-        <div className="actions"><button className="btn btn-secondary">Soo gal</button><button className="btn btn-primary">Isdiiwaangeli</button></div>
+        <div className="actions"><Link className="btn btn-secondary" href="/signin">Soo gal</Link><Link className="btn btn-primary" href="/signup">Isdiiwaangeli</Link></div>
       </div>
     </header>
   );
