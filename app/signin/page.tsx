@@ -21,8 +21,18 @@ export default function SigninPage() {
       const supabase = createSupabaseBrowserClient();
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
+      if (!data.user) throw new Error("User account lama helin.");
 
-      const role = data.user?.user_metadata?.role as string | undefined;
+      const { data: roleRecord, error: roleError } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", data.user.id)
+        .limit(1)
+        .maybeSingle();
+
+      if (roleError) throw roleError;
+
+      const role = roleRecord?.role ?? data.user.user_metadata?.role ?? "customer";
       window.location.href = dashboardForRole(role);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Login-ku wuu fashilmay.");
