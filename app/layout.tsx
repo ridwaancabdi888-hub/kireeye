@@ -1,9 +1,23 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import "./phase2.css";
 
 export const metadata: Metadata = {
-  title: "Kireeye — Gaadhiga saxda ah, goob kasta, goor kasta",
+  title: {
+    default: "Kireeye — Gaadhiga saxda ah, goob kasta, goor kasta",
+    template: "%s | Kireeye",
+  },
   description: "Somaliland iyo Soomaaliya ka kireyso gaadhi la hubo, darawal leh ama darawal la'aan.",
+  applicationName: "Kireeye",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: { capable: true, title: "Kireeye", statusBarStyle: "default" },
+  formatDetection: { telephone: true },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0c7a5a",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
