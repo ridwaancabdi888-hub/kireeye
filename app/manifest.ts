@@ -2,16 +2,23 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Kireeye",
+    id: "/",
+    name: "Kireeye — Vehicle Rental Marketplace",
     short_name: "Kireeye",
     description: "Gaadhiga saxda ah, goob kasta, goor kasta.",
     start_url: "/",
+    scope: "/",
     display: "standalone",
+    orientation: "portrait-primary",
     background_color: "#f6f8fb",
     theme_color: "#0c7a5a",
+    categories: ["travel", "business", "transportation"],
     icons: [
-      { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
-      { src: "/icon-512.png", sizes: "512x512", type: "image/png" }
+      { src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any maskable" }
+    ],
+    shortcuts: [
+      { name: "Raadi gaadhi", short_name: "Gaadiid", url: "/vehicles", icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml" }] },
+      { name: "Bookings-kayga", short_name: "Bookings", url: "/customer/bookings", icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml" }] }
     ]
   };
 }
