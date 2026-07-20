@@ -14,11 +14,32 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#0c7a5a",
     categories: ["travel", "business", "transportation"],
     icons: [
-      { src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any maskable" }
+      {
+        src: "/icon.svg",
+        sizes: "any",
+        type: "image/svg+xml",
+        purpose: "any",
+      },
+      {
+        src: "/icon.svg",
+        sizes: "any",
+        type: "image/svg+xml",
+        purpose: "maskable",
+      },
     ],
     shortcuts: [
-      { name: "Raadi gaadhi", short_name: "Gaadiid", url: "/vehicles", icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml" }] },
-      { name: "Bookings-kayga", short_name: "Bookings", url: "/customer/bookings", icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml" }] }
-    ]
+      {
+        name: "Raadi gaadhi",
+        short_name: "Gaadiid",
+        url: "/vehicles",
+        icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml" }],
+      },
+      {
+        name: "Bookings-kayga",
+        short_name: "Bookings",
+        url: "/customer/bookings",
+        icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml" }],
+      },
+    ],
   };
 }
