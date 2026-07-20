@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { PWARegister } from "@/components/PWARegister";
 import "./globals.css";
 import "./phase2.css";
+import "./phase3.css";
 
 export const metadata: Metadata = {
   title: {
