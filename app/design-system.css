@@ -1,0 +1,189 @@
+/* ============================================================
+   Kireeye Design System — foundation layer
+   Imported last: token overrides here win over legacy CSS.
+   Palette: savanna paper, deep ink, Kireeye green, sand amber.
+   Signature: the "road strip" — a green→sand marking that runs
+   along the top of the nav and key panels, echoing road paint.
+   ============================================================ */
+
+:root {
+  /* Color tokens */
+  --bg: #f7f6f1;
+  --surface: #ffffff;
+  --surface-2: #f1efe8;
+  --text: #17233b;
+  --muted: #64708a;
+  --brand: #0c7a5a;
+  --brand-dark: #07523f;
+  --brand-soft: #e7f3ee;
+  --sand: #e8a33d;
+  --sand-soft: #fbf0dd;
+  --danger: #c0443b;
+  --danger-soft: #fae9e7;
+  --info: #1f4e8c;
+  --info-soft: #e8eff9;
+  --border: #e7e4da;
+  --shadow: 0 14px 44px rgba(23, 35, 59, 0.1);
+  --shadow-sm: 0 4px 14px rgba(23, 35, 59, 0.08);
+
+  /* Type */
+  --font-display: "Bricolage Grotesque", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* Shape & rhythm */
+  --radius: 14px;
+  --radius-lg: 22px;
+  --space-1: 6px;
+  --space-2: 12px;
+  --space-3: 20px;
+  --space-4: 32px;
+  --space-5: 56px;
+}
+
+body {
+  font-family: var(--font-body);
+}
+
+h1, h2, h3, .logo, .auth-title {
+  font-family: var(--font-display);
+}
+
+h1 { letter-spacing: -1.5px; }
+
+/* Signature: road strip on the sticky nav (site-wide, zero markup) */
+.nav { position: sticky; }
+.nav::before {
+  content: "";
+  display: block;
+  height: 3px;
+  background: linear-gradient(90deg, var(--brand) 0 62%, var(--sand) 62% 78%, var(--brand) 78%);
+}
+.road-strip {
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--brand) 0 62%, var(--sand) 62% 78%, var(--brand) 78%);
+}
+
+/* Focus visibility (quality floor) */
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ------------------------------------------------------------
+   Buttons
+   ------------------------------------------------------------ */
+.btn { transition: filter 120ms ease, transform 120ms ease; }
+.btn:hover:not(:disabled) { filter: brightness(1.05); }
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+
+/* ------------------------------------------------------------
+   Status badges — one vocabulary for the whole platform.
+   Usage: <span class="status st-pending">Sugaya ansixin</span>
+   ------------------------------------------------------------ */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.status::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.st-pending, .st-awaiting_payment, .st-pending_approval, .st-draft
+  { background: var(--sand-soft); color: #8a5a12; }
+.st-approved, .st-available, .st-confirmed, .st-completed, .st-active
+  { background: var(--brand-soft); color: var(--brand-dark); }
+.st-rejected, .st-cancelled, .st-suspended, .st-disputed
+  { background: var(--danger-soft); color: var(--danger); }
+.st-rented, .st-reserved, .st-in_progress, .st-refunded, .st-maintenance, .st-archived
+  { background: var(--info-soft); color: var(--info); }
+
+/* ------------------------------------------------------------
+   Forms
+   ------------------------------------------------------------ */
+.help-text { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(12, 122, 90, 0.14);
+  outline: none;
+}
+.form-error {
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-weight: 700;
+}
+
+/* ------------------------------------------------------------
+   Feedback: empty states, skeletons, page intros
+   ------------------------------------------------------------ */
+.empty-state {
+  text-align: center;
+  padding: var(--space-5) var(--space-3);
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+.empty-state h3 { margin: 0 0 8px; }
+.empty-state p { color: var(--muted); margin: 0 0 18px; }
+
+.skeleton {
+  border-radius: var(--radius);
+  background: linear-gradient(90deg, var(--surface-2) 25%, #e9e6dd 50%, var(--surface-2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+.page-intro { margin: 0 0 var(--space-3); }
+.page-intro h1, .page-intro h2 { margin: 0 0 6px; }
+.page-intro p { color: var(--muted); margin: 0; max-width: 640px; line-height: 1.6; }
+
+/* ------------------------------------------------------------
+   Tables: card-style rows on small screens
+   Usage: add class "table-mobile" + data-label on each td
+   ------------------------------------------------------------ */
+@media (max-width: 720px) {
+  .table-mobile thead { display: none; }
+  .table-mobile tr {
+    display: block;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+    background: var(--surface);
+    padding: 6px 0;
+  }
+  .table-mobile td {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    border: 0;
+    padding: 9px 14px;
+  }
+  .table-mobile td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: var(--muted);
+    font-size: 12.5px;
+  }
+}
