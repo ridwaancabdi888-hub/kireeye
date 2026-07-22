@@ -18,6 +18,12 @@ function dashboardForRole(role?: string | null) {
 }
 
 export async function middleware(request: NextRequest) {
+  // Public self-registration is disabled platform-wide. Any /signup hit — logged
+  // in or not, env configured or not — is redirected to the login page.
+  if (request.nextUrl.pathname === "/signup") {
+    return NextResponse.redirect(new URL("/signin", request.url));
+  }
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !key) {

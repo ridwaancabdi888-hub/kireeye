@@ -32,7 +32,7 @@ export default function SigninPage() {
 
       if (roleError) throw roleError;
 
-      const role = roleRecord?.role ?? data.user.user_metadata?.role ?? "customer";
+      const role = roleRecord?.role ?? "customer";
       window.location.href = dashboardForRole(role);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Login-ku wuu fashilmay.");
@@ -41,5 +41,5 @@ export default function SigninPage() {
     }
   }
 
-  return <main className="auth-page"><section className="auth-panel"><Link className="logo" href="/"><span className="logo-mark">K</span>Kireeye</Link><span className="eyebrow">Ku soo laabo</span><h1 className="auth-title">Soo gal account-kaaga</h1><p className="muted">Maamul bookings-kaaga, gaadiidkaaga ama marketplace-ka.</p><form className="auth-form" onSubmit={handleSubmit}><div className="field"><label>Email</label><input name="email" type="email" required placeholder="email@example.com" /></div><div className="field"><label>Password</label><input name="password" type="password" required /></div><div className="row"><label className="checkbox"><input type="checkbox" /> I xasuuso</label><Link className="text-link" href="/forgot-password">Password ma ilowday?</Link></div><button className="btn btn-primary auth-submit" disabled={loading}>{loading ? "Waa la gelayaa..." : "Soo gal"}</button>{message && <p className="form-message">{message}</p>}</form><p className="muted">Account ma lihid? <Link className="text-link" href="/signup">Isdiiwaangeli</Link></p></section><aside className="auth-aside"><span className="badge">Ammaan & la xaqiijiyey</span><h2>Hal account, dhammaan adeegyada Kireeye.</h2><p>Customer, company owner, shaqaale iyo admin mid walba wuxuu helayaa dashboard-ka ku habboon.</p></aside></main>;
+  return <main className="auth-page"><section className="auth-panel"><Link className="logo" href="/"><span className="logo-mark">K</span>Kireeye</Link><span className="eyebrow">Ku soo laabo</span><h1 className="auth-title">Soo gal account-kaaga</h1><p className="muted">Maamul bookings-kaaga, gaadiidkaaga ama marketplace-ka.</p><form className="auth-form" onSubmit={handleSubmit}><div className="field"><label>Email</label><input name="email" type="email" required placeholder="email@example.com" /></div><div className="field"><label>Password</label><input name="password" type="password" required /></div><div className="row"><label className="checkbox"><input type="checkbox" /> I xasuuso</label><Link className="text-link" href="/forgot-password">Password ma ilowday?</Link></div><button className="btn btn-primary auth-submit" disabled={loading}>{loading ? "Waa la gelayaa..." : "Soo gal"}</button>{message && <p className="form-message">{message}</p>}</form><p className="help-text">Accounts-ka waxaa sameeya maamulka. Haddii aadan account lahayn, la xiriir shirkaddaada ama maamulka Kireeye.</p></section><aside className="auth-aside"><span className="badge">Ammaan & la xaqiijiyey</span><h2>Hal account, dhammaan adeegyada Kireeye.</h2><p>Customer, company owner, shaqaale iyo admin mid walba wuxuu helayaa dashboard-ka ku habboon.</p></aside></main>;
 }

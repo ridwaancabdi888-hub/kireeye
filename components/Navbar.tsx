@@ -13,7 +13,7 @@ export async function Navbar() {
         <nav className="nav-links">
           <Link href="/vehicles">{t.vehicles}</Link><a href="/#cities">{t.cities}</a><Link href="/partners">{t.partners}</Link><Link href="/about">{t.about}</Link>
         </nav>
-        <div className="actions"><LanguageSwitcher/><Link className="btn btn-secondary" href="/signin">{t.signin}</Link><Link className="btn btn-primary" href="/signup">{t.signup}</Link></div>
+        <div className="actions"><LanguageSwitcher/><Link className="btn btn-primary" href="/signin">{t.signin}</Link></div>
       </div>
     </header>
   );
