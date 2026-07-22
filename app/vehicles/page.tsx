@@ -1,8 +1,15 @@
 import { Navbar } from "@/components/Navbar";
 import { VehicleCard } from "@/components/VehicleCard";
 import { getAvailableVehicles } from "@/lib/marketplace-data";
+import { createPublicMetadata } from "@/lib/seo";
 
 export const revalidate = 60;
+
+export const metadata = createPublicMetadata({
+  title: "Gaadiid Kiro ah Hargeysa iyo Muqdisho",
+  description: "Ka raadi gaadiid kiro ah Hargeysa, Muqdisho iyo garoomada diyaaradaha; ku kala saar goobta, category-ga iyo qiimaha maalintii.",
+  path: "/vehicles",
+});
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 

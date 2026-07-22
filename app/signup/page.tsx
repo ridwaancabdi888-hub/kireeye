@@ -1,4 +1,7 @@
 import { redirect } from "next/navigation";
+import { utilityMetadata } from "@/lib/seo";
+
+export const metadata = utilityMetadata;
 
 /**
  * Public self-registration is disabled. Accounts are created only by the Super

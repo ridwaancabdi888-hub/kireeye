@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { PWARegister } from "@/components/PWARegister";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 import "./phase2.css";
 import "./phase3.css";
@@ -9,12 +10,15 @@ import "./image-tools.css";
 import "./design-system.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "Kireeye — Gaadhiga saxda ah, goob kasta, goor kasta",
+    default: "Kireeye | Kirada Gaadiidka Somaliland iyo Soomaaliya",
     template: "%s | Kireeye",
   },
-  description: "Somaliland iyo Soomaaliya ka kireyso gaadhi la hubo, darawal leh ama darawal la'aan.",
+  description: "Ka raadi gaadiid kiro ah Hargeysa, Muqdisho iyo garoomada diyaaradaha adigoo isticmaalaya marketplace-ka Kireeye.",
   applicationName: "Kireeye",
+  creator: "Kireeye",
+  publisher: "Kireeye",
   manifest: "/manifest.webmanifest",
   icons: { icon: "/icon.svg", apple: "/icon.svg" },
   appleWebApp: { capable: true, title: "Kireeye", statusBarStyle: "default" },

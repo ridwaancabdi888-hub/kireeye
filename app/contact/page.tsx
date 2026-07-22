@@ -1,3 +1,10 @@
 import { Navbar } from "@/components/Navbar";
+import { createPublicMetadata } from "@/lib/seo";
+
+export const metadata = createPublicMetadata({
+  title: "Nala Soo Xiriir",
+  description: "Kireeye kala xiriir booking, partnership, payment ama support adigoo isticmaalaya phone, WhatsApp ama email-ka la xaqiijiyey.",
+  path: "/contact",
+});
 
 export default function ContactPage(){return <><Navbar/><main className="section"><div className="container"><div className="section-head"><div><span className="eyebrow">Contact Kireeye</span><h1 className="details-title">Nala soo xiriir</h1><p className="lead">Booking, partnership, payment ama support.</p></div></div><div className="grid-3"><a className="card" href="tel:+252634199277"><h2>📞 Phone</h2><p className="muted">+252 63 4199277</p></a><a className="card" href="https://wa.me/252634199277"><h2>💬 WhatsApp</h2><p className="muted">+252 63 4199277</p></a><a className="card" href="mailto:ridwaancabdi888@gmail.com"><h2>✉️ Email</h2><p className="muted">ridwaancabdi888@gmail.com</p></a></div><section className="section"><div className="card"><h2>Support ticket</h2><p className="muted">Account aad leedahay marka aad soo gasho, support ticket samee si fariintaada iyo jawaabaha loo kaydiyo.</p><a className="btn btn-primary" href="/support">Fur support center</a></div></section></div></main></>}
