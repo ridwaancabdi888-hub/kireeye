@@ -20,7 +20,7 @@ Production: https://kireeye-x2oq-ruddy.vercel.app/
 
 ## Prerequisites
 
-- Node.js 20 or newer
+- Node.js 24.x
 - npm
 
 ## Run locally
