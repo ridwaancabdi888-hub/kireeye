@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { enforceRateLimit } from "@/lib/rate-limit";
 import { getManagedCompany } from "@/lib/access-control";
 import { createSupabaseAdminClient, createSupabaseServerClient } from "@/lib/supabase-server";
 
@@ -41,7 +42,7 @@ async function requireCompanyAdmin() {
   if (!company) {
     return { error: NextResponse.json({ error: "You must be a company admin to manage company users." }, { status: 403 }) };
   }
-  return { admin, user, company };
+  return { admin, user, company, supabase };
 }
 
 export async function GET() {
@@ -61,7 +62,10 @@ export async function GET() {
 export async function POST(request: Request) {
   const gate = await requireCompanyAdmin();
   if ("error" in gate) return gate.error;
-  const { admin, user, company } = gate;
+  const { admin, user, company, supabase } = gate;
+
+  const limited = await enforceRateLimit(supabase, "company:user:create", "Too many user creation attempts. Please wait and try again.");
+  if (limited) return limited;
 
   try {
     const body = await request.json();
@@ -130,7 +134,10 @@ export async function POST(request: Request) {
 export async function PATCH(request: Request) {
   const gate = await requireCompanyAdmin();
   if ("error" in gate) return gate.error;
-  const { admin, user, company } = gate;
+  const { admin, user, company, supabase } = gate;
+
+  const limited = await enforceRateLimit(supabase, "company:user:update", "Too many user updates. Please wait and try again.");
+  if (limited) return limited;
 
   try {
     const body = await request.json();
