@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { enforceRateLimit } from "@/lib/rate-limit";
 import { createSupabaseAdminClient, createSupabaseServerClient } from "@/lib/supabase-server";
 
 const allowedMethods = new Set(["ZAAD","E-Dahab","EVC Plus","Sahal"]);
@@ -11,6 +12,9 @@ export async function POST(request: Request) {
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const limited = await enforceRateLimit(supabase, "payment:proof", "Too many payment submissions. Please wait and try again.");
+    if (limited) return limited;
 
     const body = await request.json();
     const bookingId = String(body.bookingId || "");
