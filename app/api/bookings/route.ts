@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { enforceRateLimit } from "@/lib/rate-limit";
 import { createSupabaseAdminClient, createSupabaseServerClient } from "@/lib/supabase-server";
 
 const allowedRentalTypes = new Set(["hourly","daily","weekly","monthly","intercity","airport"]);
@@ -12,6 +13,9 @@ export async function POST(request: Request) {
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const limited = await enforceRateLimit(supabase, "booking:create", "Too many booking attempts. Please wait and try again.");
+    if (limited) return limited;
 
     const body = await request.json();
     const vehicleId = String(body.vehicleId || "");
