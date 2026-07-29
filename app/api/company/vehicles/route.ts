@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { enforceRateLimit } from "@/lib/rate-limit";
 import { getManagedCompany, getPrimaryRole, isPlatformAdmin } from "@/lib/access-control";
 import { createSupabaseAdminClient, createSupabaseServerClient } from "@/lib/supabase-server";
 
@@ -12,6 +13,9 @@ export async function POST(request: Request) {
     if (!supabase || !admin) return NextResponse.json({ error: "Supabase configuration is missing." }, { status: 503 });
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const limited = await enforceRateLimit(supabase, "vehicle:create", "Too many vehicle creation attempts. Please wait and try again.");
+    if (limited) return limited;
 
     const role = await getPrimaryRole(admin, user.id);
     const managedCompany = await getManagedCompany(admin, user.id, "vehicles.manage");
