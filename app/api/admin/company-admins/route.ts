@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { enforceRateLimit } from "@/lib/rate-limit";
 import { getPrimaryRole } from "@/lib/access-control";
 import { createSupabaseAdminClient, createSupabaseServerClient } from "@/lib/supabase-server";
 
@@ -40,7 +41,7 @@ async function requireSuperAdmin() {
   if (role !== "super_admin") {
     return { error: NextResponse.json({ error: "Only the Super Admin can manage company admins." }, { status: 403 }) };
   }
-  return { admin, user };
+  return { admin, user, supabase };
 }
 
 export async function GET() {
@@ -59,7 +60,10 @@ export async function GET() {
 export async function POST(request: Request) {
   const gate = await requireSuperAdmin();
   if ("error" in gate) return gate.error;
-  const { admin, user } = gate;
+  const { admin, user, supabase } = gate;
+
+  const limited = await enforceRateLimit(supabase, "admin:company:create", "Too many company creation attempts. Please wait and try again.");
+  if (limited) return limited;
 
   try {
     const body = await request.json();
