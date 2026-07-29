@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { enforceRateLimit } from "@/lib/rate-limit";
 import { canManageBooking } from "@/lib/access-control";
 import { createSupabaseAdminClient, createSupabaseServerClient } from "@/lib/supabase-server";
 
@@ -19,6 +20,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const limited = await enforceRateLimit(supabase, "booking:status", "Too many booking status changes. Please wait and try again.");
+    if (limited) return limited;
     if (!(await canManageBooking(admin, user.id, id, "bookings.manage"))) return NextResponse.json({ error: "You do not have permission to manage this booking." }, { status: 403 });
 
     const { data: booking } = await admin.from("bookings").select("id,status,vehicle_id").eq("id", id).maybeSingle();
