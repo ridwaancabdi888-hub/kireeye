@@ -43,6 +43,10 @@ npm run dev
 
 Open http://localhost:3000
 
+## Database setup
+
+Create a Supabase project, then apply every SQL file in `supabase/migrations` in filename order using the Supabase SQL Editor. The complete migration set is required for the application schema and the database-backed rate limiting used by protected write endpoints.
+
 ## Available scripts
 
 - `npm run dev` — start the development server
