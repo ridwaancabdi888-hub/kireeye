@@ -45,7 +45,7 @@ Open http://localhost:3000
 
 ## Database setup
 
-Create a Supabase project, then apply every SQL file in `supabase/migrations` in filename order using the Supabase SQL Editor. The complete migration set is required for the application schema and the database-backed rate limiting used by protected write endpoints.
+`supabase/migrations` contains incremental changes for the existing Supabase baseline; it is not a complete bootstrap for a blank project. Apply those files in filename order only after the baseline migration history is present. The root-level `supabase/schema.sql`, `auth_setup.sql`, and `phase*.sql` files are deprecated historical snapshots and must not be used to initialize a new database. See `supabase/README.md` and `docs/database.md` before changing or recreating the database.
 
 ## Available scripts
 
