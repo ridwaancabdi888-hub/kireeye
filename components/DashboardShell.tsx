@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/auth";
 
 type NavItem = readonly [label: string, href: string, icon: string];
@@ -45,6 +45,8 @@ function isActive(pathname: string, portal: string, href: string) {
 export function DashboardShell({ title, children }: { title: string; children: React.ReactNode }) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLElement>(null);
   const portal = pathname.startsWith("/admin") ? "admin" : pathname.startsWith("/company") ? "company" : "customer";
   const navigation = portal === "admin" ? adminNav : portal === "company" ? companyNav : customerNav;
   const portalLabel = portal === "admin" ? "Super Admin" : portal === "company" ? "Company" : "Customer";
@@ -53,6 +55,46 @@ export function DashboardShell({ title, children }: { title: string; children: R
     : portal === "company"
       ? [companyNav[0], companyNav[2], companyNav[3]]
       : [customerNav[0], customerNav[1], customerNav[3]];
+
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const focusFrame = requestAnimationFrame(() => closeButtonRef.current?.focus());
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setMenuOpen(false);
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+
+      const focusableElements = drawerRef.current?.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled])',
+      );
+      if (!focusableElements?.length) return;
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+
+      if (event.shiftKey && document.activeElement === firstElement) {
+        event.preventDefault();
+        lastElement.focus();
+      } else if (!event.shiftKey && document.activeElement === lastElement) {
+        event.preventDefault();
+        firstElement.focus();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      cancelAnimationFrame(focusFrame);
+      document.removeEventListener("keydown", handleKeyDown);
+      previouslyFocused?.focus();
+    };
+  }, [menuOpen]);
 
   async function signOut() {
     try {
@@ -74,7 +116,7 @@ export function DashboardShell({ title, children }: { title: string; children: R
     <main className="main">
       <header className="mobile-dashboard-header">
         <Link className="mobile-dashboard-brand" href={`/${portal}`}><span className="logo-mark">K</span><span><strong>Kireeye</strong><small>{portalLabel} Portal</small></span></Link>
-        <button className="mobile-menu-button" type="button" aria-label="Open dashboard menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)}><span>☰</span> Menu</button>
+        <button className="mobile-menu-button" type="button" aria-label="Open dashboard menu" aria-expanded={menuOpen} aria-controls="dashboard-mobile-menu" aria-haspopup="dialog" onClick={() => setMenuOpen(true)}><span aria-hidden="true">☰</span> Menu</button>
       </header>
 
       <div className="row dashboard-heading"><div><p className="muted">Kireeye Dashboard</p><h1 className="dashboard-title">{title}</h1></div>{portal === "company" && <Link className="btn btn-primary" href="/company/vehicles/new">+ Ku dar gaadhi</Link>}</div>
@@ -83,12 +125,12 @@ export function DashboardShell({ title, children }: { title: string; children: R
 
     <nav className="mobile-bottom-nav" aria-label="Dashboard quick navigation">
       {quickLinks.map(([label, href, icon]) => <Link key={href} href={href} aria-current={isActive(pathname, portal, href) ? "page" : undefined}><span className="mobile-nav-icon">{icon}</span><span>{label}</span></Link>)}
-      <button type="button" className={menuOpen ? "active" : ""} onClick={() => setMenuOpen(true)}><span className="mobile-nav-icon">☰</span><span>More</span></button>
+      <button type="button" className={menuOpen ? "active" : ""} aria-expanded={menuOpen} aria-controls="dashboard-mobile-menu" aria-haspopup="dialog" onClick={() => setMenuOpen(true)}><span className="mobile-nav-icon" aria-hidden="true">☰</span><span>More</span></button>
     </nav>
 
     {menuOpen && <div className="mobile-menu-layer" role="presentation" onClick={() => setMenuOpen(false)}>
-      <aside className="mobile-menu-drawer" role="dialog" aria-modal="true" aria-label={`${portalLabel} navigation`} onClick={(event) => event.stopPropagation()}>
-        <div className="mobile-menu-head"><Link className="logo" href="/" onClick={() => setMenuOpen(false)}><span className="logo-mark">K</span>Kireeye</Link><button type="button" className="mobile-menu-close" aria-label="Close dashboard menu" onClick={() => setMenuOpen(false)}>×</button></div>
+      <aside ref={drawerRef} id="dashboard-mobile-menu" className="mobile-menu-drawer" role="dialog" aria-modal="true" aria-label={`${portalLabel} navigation`} onClick={(event) => event.stopPropagation()}>
+        <div className="mobile-menu-head"><Link className="logo" href="/" onClick={() => setMenuOpen(false)}><span className="logo-mark">K</span>Kireeye</Link><button ref={closeButtonRef} type="button" className="mobile-menu-close" aria-label="Close dashboard menu" onClick={() => setMenuOpen(false)}>×</button></div>
         <p className="sidebar-label">{portalLabel} Portal</p>
         <nav className="mobile-menu-links">{navigation.map(([label, href, icon]) => <Link key={href} href={href} onClick={() => setMenuOpen(false)} className={`mobile-drawer-link ${isActive(pathname, portal, href) ? "active" : ""}`}><span>{icon}</span><strong>{label}</strong><span>›</span></Link>)}</nav>
         <div className="mobile-menu-footer"><Link href="/" className="mobile-drawer-link" onClick={() => setMenuOpen(false)}><span>←</span><strong>Website</strong><span>›</span></Link><button type="button" className="mobile-drawer-link mobile-signout" onClick={signOut}><span>↪</span><strong>Sign out</strong><span>›</span></button></div>
