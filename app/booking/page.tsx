@@ -73,14 +73,14 @@ export default function BookingPage() {
     }
   }
 
-  return <main className="section"><div className="container"><span className="eyebrow">Secure checkout</span><h1 className="details-title">Dhammaystir booking-ka</h1><form className="checkout-grid" onSubmit={submit}><section className="card auth-form">
-    <div className="field"><label>Pickup date & time</label><input name="pickupAt" type="datetime-local" required/></div>
-    <div className="field"><label>Return date & time</label><input name="returnAt" type="datetime-local" required/></div>
-    <div className="field"><label>Muddada qiyaasta maalmaha</label><input type="number" min="1" value={days} onChange={event => setDays(Math.max(1, Number(event.target.value)))}/></div>
-    <div className="field"><label>Habka kirada</label><select name="rentalType"><option value="daily">Maalinle</option><option value="hourly">Saacadle</option><option value="weekly">Toddobaadle</option><option value="monthly">Bille</option><option value="intercity">Safar magaalo kale</option><option value="airport">Airport pickup</option></select></div>
+  return <main className="section"><div className="container"><span className="eyebrow">Secure checkout</span><h1 className="details-title">Dhammaystir booking-ka</h1><form className="checkout-grid" onSubmit={submit} aria-busy={loading}><section className="card auth-form">
+    <div className="field"><label htmlFor="booking-pickup-at">Pickup date & time</label><input id="booking-pickup-at" name="pickupAt" type="datetime-local" required/></div>
+    <div className="field"><label htmlFor="booking-return-at">Return date & time</label><input id="booking-return-at" name="returnAt" type="datetime-local" required/></div>
+    <div className="field"><label htmlFor="booking-days">Muddada qiyaasta maalmaha</label><input id="booking-days" type="number" min="1" value={days} onChange={event => setDays(Math.max(1, Number(event.target.value)))}/></div>
+    <div className="field"><label htmlFor="booking-rental-type">Habka kirada</label><select id="booking-rental-type" name="rentalType"><option value="daily">Maalinle</option><option value="hourly">Saacadle</option><option value="weekly">Toddobaadle</option><option value="monthly">Bille</option><option value="intercity">Safar magaalo kale</option><option value="airport">Airport pickup</option></select></div>
     <label className="checkbox"><input type="checkbox" checked={driver} onChange={event => setDriver(event.target.checked)}/> Darawal ku dar ($15 maalintii)</label>
-    <div className="field"><label>Habka lacag-bixinta</label><select name="paymentMethod"><option>ZAAD</option><option>E-Dahab</option><option>EVC Plus</option><option>Sahal</option><option>Cash / Pay on pickup</option></select></div>
-    <button className="btn btn-primary" disabled={loading}>{loading ? "Waa la xaqiijinayaa..." : "Xaqiiji booking-ka"}</button>
-    {message && <p className="form-message">{message}</p>}
+    <div className="field"><label htmlFor="booking-payment-method">Habka lacag-bixinta</label><select id="booking-payment-method" name="paymentMethod"><option>ZAAD</option><option>E-Dahab</option><option>EVC Plus</option><option>Sahal</option><option>Cash / Pay on pickup</option></select></div>
+    <button className="btn btn-primary" type="submit" disabled={loading}>{loading ? "Waa la xaqiijinayaa..." : "Xaqiiji booking-ka"}</button>
+    {message && <p className="form-message" role="alert" aria-live="assertive">{message}</p>}
   </section><aside className="booking-card"><h2>{vehicleName}</h2><p className="muted">Server-ku wuxuu xaqiijinayaa availability-ga iyo qiimaha kama dambaysta ah.</p><div className="summary-line"><span>Kirada qiyaasta</span><strong>${rentalAmount}</strong></div><div className="summary-line"><span>Darawal</span><strong>${driverAmount}</strong></div><div className="summary-line"><span>Service fee qiyaasta</span><strong>${estimatedFee}</strong></div><div className="summary-line total"><span>Estimated total</span><strong>${estimatedTotal}</strong></div><p className="muted">Qiimaha rasmiga ah waxaa xisaabinaya server-ka iyadoo lagu salaynayo waqtiga, rental type-ka iyo commission-ka company-ga.</p></aside></form></div></main>;
 }
