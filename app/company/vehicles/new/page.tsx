@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { DashboardShell } from "@/components/DashboardShell";
 import { VehicleImageUploader } from "@/components/VehicleImageUploader";
+import { readApiResponse } from "@/lib/api-response";
 
 export default function AddVehiclePage() {
   const [message, setMessage] = useState("");
@@ -40,8 +41,7 @@ export default function AddVehiclePage() {
           plateNumber: form.get("plateNumber"),
         }),
       });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "Gaadhiga lama kaydin.");
+      const result = await readApiResponse<{ vehicleId: string }>(response, "Gaadhiga lama kaydin.", ["vehicleId"]);
 
       setVehicleId(result.vehicleId);
       setMessage("Gaadhiga waa la kaydiyey. Hadda geli sawirrada, kadib Admin ayaa ansixinaya.");

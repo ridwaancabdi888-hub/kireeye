@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/auth";
+import { readApiResponse } from "@/lib/api-response";
 
 export default function BookingPage() {
   const [vehicleId, setVehicleId] = useState("");
@@ -58,12 +59,11 @@ export default function BookingPage() {
           driverRequired: driver,
         }),
       });
-      const result = await response.json();
       if (response.status === 401) {
         window.location.href = `/signin?next=${encodeURIComponent(window.location.pathname + window.location.search)}`;
         return;
       }
-      if (!response.ok) throw new Error(result.error || "Booking-ku wuu fashilmay.");
+      const result = await readApiResponse<{ bookingId: string; paymentMethod: string; total: number }>(response, "Booking-ku wuu fashilmay.", ["bookingId", "paymentMethod", "total"]);
 
       if (result.paymentMethod === "Cash / Pay on pickup") window.location.href = "/customer/bookings";
       else window.location.href = `/customer/payments/${result.bookingId}?method=${encodeURIComponent(result.paymentMethod)}&amount=${result.total}`;

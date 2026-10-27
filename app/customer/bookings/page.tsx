@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { DashboardShell } from "@/components/DashboardShell";
 import { createSupabaseBrowserClient } from "@/lib/auth";
+import { readApiResponse } from "@/lib/api-response";
 
 type Booking = { id:string; pickup_at:string; return_at:string; total:number; status:string; vehicle_id:string; vehicles:{name:string}|null };
 
@@ -30,8 +31,7 @@ export default function CustomerBookingsPage() {
     setMessage("");
     try {
       const response = await fetch(`/api/bookings/${id}/cancel`, { method: "POST" });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "Booking-ka lama cancel-gareyn.");
+      const result = await readApiResponse<{ cancellationType: string }>(response, "Booking-ka lama cancel-gareyn.", ["cancellationType"]);
       setMessage(result.cancellationType === "late" ? "Booking-ka waa la cancel-gareeyey. Late-cancellation policy ayaa khusayn karta." : "Booking-ka waa la cancel-gareeyey lacag la’aan.");
       load();
     } catch (error) {

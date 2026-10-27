@@ -3,6 +3,7 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { DashboardShell } from "@/components/DashboardShell";
 import { createSupabaseBrowserClient } from "@/lib/auth";
+import { readApiResponse } from "@/lib/api-response";
 
 export default function PaymentProofPage({ params }: { params: Promise<{ bookingId: string }> }) {
   const [bookingId, setBookingId] = useState("");
@@ -58,8 +59,7 @@ export default function PaymentProofPage({ params }: { params: Promise<{ booking
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ bookingId, method, reference: form.get("reference"), proofPath: storagePath }),
       });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "Payment proof-ka lama gudbin.");
+      const result = await readApiResponse<{ amount: number }>(response, "Payment proof-ka lama gudbin.", ["amount"]);
 
       setAmount(Number(result.amount));
       setMessage("Payment proof-ka waa la gudbiyey. Admin ayaa xaqiijinaya.");

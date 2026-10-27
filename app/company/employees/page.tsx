@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { DashboardShell } from "@/components/DashboardShell";
 import { createSupabaseBrowserClient } from "@/lib/auth";
+import { readApiResponse } from "@/lib/api-response";
 
 const permissionOptions = [
   "bookings.view",
@@ -69,8 +70,7 @@ export default function EmployeesPage() {
           permissions: form.getAll("permissions"),
         }),
       });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "Invitation failed.");
+      const result = await readApiResponse<{ message: string }>(response, "Invitation failed.", ["message"]);
       setMessage(result.message);
       event.currentTarget.reset();
     } catch (error) {
